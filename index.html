@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Specialist Database Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background-color: #fff;
+            width: 100%;
+            max-width: 700px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .header h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        .score-tracker {
+            background-color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            color: #2d3748;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 1.05rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            color: #4a5568;
+        }
+
+        .option-btn:hover:not([disabled]) {
+            background-color: #ebf8ff;
+            border-color: #3182ce;
+        }
+
+        .option-btn.correct {
+            background-color: #c6f6d5;
+            border-color: #38a169;
+            color: #22543d;
+        }
+
+        .option-btn.wrong {
+            background-color: #fed7d7;
+            border-color: #e53e3e;
+            color: #742a2a;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        #next-btn {
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: none;
+        }
+
+        #next-btn:hover {
+            background-color: #2b6cb0;
+        }
+
+        .result-screen {
+            text-align: center;
+            display: none;
+        }
+
+        .result-screen h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .result-screen p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #4a5568;
+        }
+
+        .restart-btn {
+            background-color: #38a169;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .restart-btn:hover {
+            background-color: #2f855a;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div id="quiz-interface">
+            <div class="header">
+                <h2>Database Exam Prep</h2>
+                <span class="score-tracker">Q: <span id="current-q">1</span> / <span id="total-q">54</span></span>
+            </div>
+            <div class="question-text" id="question">Loading question...</div>
+            <div class="options-container" id="options"></div>
+            <div class="controls">
+                <button id="next-btn">Next Question</button>
+            </div>
+        </div>
+
+        <div id="result-screen" class="result-screen">
+            <h2>Quiz Completed!</h2>
+            <p>You scored <span id="final-score">0</span> out of <span id="total-score">0</span></p>
+            <button class="restart-btn" onclick="location.reload()">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            // Original Conversation Questions
+            { question: "You execute: SELECT Title FROM Movie WHERE Title = 'Sample Movie' ORDER BY Title GROUP BY Title HAVING COUNT(*) = 1. What fixes the syntax error?", options: ["Remove the ORDER BY clause", "Change HAVING to COUNT(1)", "Remove GROUP BY clause", "Change HAVING to COUNT(Title)"], correct: 0 },
+            { question: "Which statement deletes the rows where the employee’s phone number is not entered?", options: ["WHERE Phone = NULLABLE", "WHERE Phone = NULL", "WHERE Phone IS NOT NULL", "WHERE Phone IS NULL"], correct: 3 },
+            { question: "Which statement automatically creates a clustered index?", options: ["(EmployeeID INTEGER DISTINCT)", "(EmployeeID INTEGER NULL)", "(EmployeeID INTEGER PRIMARY KEY)", "(EmployeeID INTEGER INDEX)"], correct: 2 },
+            { question: "To update Harry in San Francisco, which WHERE clause is correct?", options: ["WHERE (NAME IN 'Harry', 'San Francisco')", "WHERE (NAME = 'Harry' OR City = 'San Francisco')", "WHERE (NAME = 'Harry' AND City = 'San Francisco')", "WHERE ID = 4"], correct: 2 },
+            { question: "You delete rows from a base table. What happens to the result set of a View that relies on that data?", options: ["Archived", "Deleted", "Unchanged", "Empty"], correct: 3 },
+            { question: "Which query excludes Texas (TX) and Arizona (AZ)?", options: ["WHERE NOT ship_state = 'TX' OR NOT ship_state = 'AZ'", "WHERE ship_state NOT = 'TX' AND ship_state NOT = 'AZ'", "WHERE NOT ship_state = 'TX' AND NOT ship_state = 'AZ'", "WHERE ship_state NOT = 'TX' OR ship_state NOT = 'AZ'"], correct: 2 },
+            { question: "How do you completely remove the SSN column from the Customers table?", options: ["ALTER TABLE Customers DROP COLUMN SSN;", "ALTER TABLE Customers DELETE SSN;", "ALTER TABLE Customers REMOVE SSN;", "ALTER TABLE Customers DROP SSN;"], correct: 0 },
+            { question: "How do you filter for buildings that have not yet been inspected (where InspectionDate is missing)?", options: ["WHERE InspectionDate IS NULL", "WHERE InspectionDate = NULL", "WHERE InspectionDate IS NOT NULL", "WHERE InspectionDate = 0"], correct: 0 },
+            { question: "Which statement correctly calculates the grand total of all items ordered?", options: ["SELECT SUM(ID) FROM ItemsOnOrder", "SELECT SUM(LineItemTotal) FROM ItemsOnOrder", "SELECT AVG(LineItemTotal) FROM ItemsOnOrder", "SELECT COUNT(ID) FROM ItemsOnOrder"], correct: 1 },
+            { question: "To normalize a database to first normal form, which requirement must you meet?", options: ["Exclude composite keys", "Exclude foreign keys", "Exclude repeating groups", "Include transitive dependencies"], correct: 2 },
+            { question: "If you execute a SELECT statement without an ORDER BY clause, how are the rows organized?", options: ["In alphabetical order", "In no predictable order", "In chronological order", "In the order they were inserted"], correct: 1 },
+            { question: "Which clause filters aggregate results (like counting orders less than 50)?", options: ["WHERE", "ORDER BY", "HAVING", "GROUP BY"], correct: 2 },
+            { question: "Which keyword should you use to find every product whose name contains a specific character?", options: ["FETCH", "IN", "BETWEEN", "LIKE"], correct: 3 },
+            { question: "Which SQL statement deletes records with the GivenName Tia?", options: ["DELETE FROM Volunteer WHERE GivenName = 'Tia'", "DELETE FROM Volunteer WHERE GivenName EQUALS 'Tia'", "DELETE FROM Volunteer WHERE GivenName IS 'Tia'", "DELETE FROM Volunteer WHERE GivenName == 'Tia'"], correct: 0 },
+            { question: "What term describes the relationship where ProductID determines ProductCategory?", options: ["Compositional", "Deterministic", "Functionally dependent", "Cohort"], correct: 2 },
+            
+            // PDF Extracted Questions
+            { question: "Each column name in a table must be unique.", options: ["True", "False"], correct: 0 },
+            { question: "Which statement updates ProductCategory to 43 for all spoons?", options: ["UPDATE Product SET ProductCategory = 43 WHERE ProductDescription = 'spoon'", "UPDATE Product WHERE ProductDescription = 'spoon' SET ProductCategory = 43", "UPDATE Product TO ProductCategory = 43 WHERE ProductDescription = 'spoon'", "UPDATE Product WHERE ProductDescription = 'spoon' TO ProductCategory = 43"], correct: 0 },
+            { question: "Deleting a row in Order automatically deletes corresponding rows in OrderItem. This is an example of:", options: ["Waterfall delete", "Inherited delete", "Cascade delete", "Functional delete"], correct: 2 },
+            { question: "You attempt to INSERT a row with an ID that already exists in a Primary Key column. What is the result?", options: ["A new row in table", "An error stating that duplicate ids are not allowed", "An error stating that null values are not allowed", "A syntax error"], correct: 1 },
+            { question: "A query concatenating 'Greetings' + Prefix + Firstname returns NULL. What is the cause?", options: ["You must specify the JOIN keyword", "The plus (+) operator cannot be used", "You must specify the NULLIF keyword", "The Prefix or FirstName columns have null values"], correct: 3 },
+            { question: "Which feature does a relational database use to ensure that data entered into a column is valid?", options: ["An attribute", "A primary key", "An index", "A constraint"], correct: 3 },
+            { question: "To make searching by Category more efficient in a 1-million row table, you should create:", options: ["A non-clustered index on the Category column", "A clustered index on the Price column", "A clustered index on the ProductName column", "A non-clustered index on the Price column"], correct: 0 },
+            { question: "A join that selects all customers and their orders, PLUS customers who have no orders, represents a:", options: ["Partial join", "Complete join", "Full join", "Inner join"], correct: 2 },
+            { question: "Which statement should you use to remove a foreign key?", options: ["Delete table", "Alter table", "Alter foreign key", "Delete foreign key"], correct: 1 },
+            { question: "Which database object can you use to store a complex query to be called manually at any time?", options: ["Trigger", "View", "Function", "Stored procedure"], correct: 3 },
+            { question: "Which query will increase the price of item 1 by 6 percent?", options: ["ALTER Products SET Price = Price * 1.06 WHERE ItemNumber = 1;", "SET Price = Price * 1.06 FROM Products WHERE ItemNumber = 1;", "UPDATE Products SET Price = Price * 1.06 WHERE ItemNumber = 1;", "USE Products SET Price = Price * 1.06 WHERE ItemNumber = 1;"], correct: 2 },
+            { question: "Which data definition language (DDL) keyword deletes an entire database table?", options: ["Alter", "Delete", "Truncate", "Drop"], correct: 3 },
+            { question: "Executing 'SELECT EmployeeID FROM Employee, Department' performs a:", options: ["Equi-join", "Cartesian product", "Outer join", "Intersection"], correct: 1 },
+            { question: "Which statement should you use to remove a view named EmployeeView?", options: ["DELETE EmployeeView", "DROP VIEW EmployeeView", "DELETE View EmployeeView", "DROP EmployeeView"], correct: 1 },
+            { question: "You execute a transaction to delete 100 rows, but it fails at 40 rows. What is the database result?", options: ["40 rows will be deleted", "The table will be corrupted", "No rows will be deleted from the Table", "The transaction will restart"], correct: 2 },
+            { question: "A Cars table has 3 rows. A Colors table has 2 rows. A LEFT OUTER JOIN from Cars to Colors returns how many rows?", options: ["0", "2", "6", "3"], correct: 3 },
+            { question: "Which SQL keyword is valid inside a CREATE TABLE statement?", options: ["Insert Into", "Order By", "Primary Key", "Having"], correct: 2 },
+            { question: "A full database backup is a copy of all the data in the entire database.", options: ["True", "False"], correct: 0 },
+            { question: "To create a view that returns an alphabetical list of game names, use:", options: ["SELECT * FROM Games", "SELECT Name FROM Games ORDER BY Name", "SELECT Name FROM Games", "SELECT * FROM Games WHERE Name BETWEEN 'A' AND 'Z'"], correct: 1 },
+            { question: "One reason to create a stored procedure is to:", options: ["Improve performance", "Minimize storage space", "Bypass case sensitivity", "Give the user control of the logic"], correct: 0 },
+            { question: "To ensure an employee can only be assigned to an existing department, apply:", options: ["An index", "A data type", "A primary key", "A foreign key"], correct: 3 },
+            { question: "To populate a new table 'EmployeeCopy' from 'Employee', use:", options: ["Copy * Into Employee", "Select * Into Employee", "Insert Into EmployeeCopy Select * From Employee", "Insert * From Employee"], correct: 2 },
+            { question: "Which statement deletes CustomerID 12345?", options: ["DELETE CustomerID FROM Customer WHERE CustomerID = 12345", "DELETE FROM Customer WHERE CustomerID = 12345", "UPDATE Customer DELETE * WHERE CustomerID = 12345", "DELETE * FROM Customer WHERE CustomerID = 12345"], correct: 1 },
+            { question: "Which keyword combines two queries and returns ONLY rows that appear in BOTH?", options: ["JOIN", "UNION", "ALL", "INTERSECT"], correct: 3 },
+            { question: "A Cross Join on two tables containing 3 rows each, with no WHERE clause, returns how many rows?", options: ["0", "3", "6", "9"], correct: 3 },
+            { question: "Which statement adds a new column named District to Customer?", options: ["ALTER TABLE Customer MODIFY (District INTEGER)", "ALTER TABLE Customer ADD (District INTEGER)", "MODIFY TABLE Customer ADD (INTEGER District)", "ALTER TABLE Customer ADD (INTEGER District)"], correct: 1 },
+            { question: "One difference between a function and a stored procedure is that a function:", options: ["Must be called from a trigger", "Cannot accept parameters", "Must return a value", "Cannot contain a transaction"], correct: 2 },
+            { question: "Which is a Data Manipulation Language (DML) statement?", options: ["ALTER TABLE", "CREATE TABLE", "INSERT INTO", "DROP VIEW"], correct: 2 },
+            { question: "In a table with Event, Year, PetID, and Birthdate, which column prevents Third Normal Form?", options: ["PetID", "Year", "Birthdate", "ID"], correct: 2 },
+            { question: "To disable User1's access to view Customer data, use:", options: ["REVOKE SELECT ON Customer FROM User1", "REMOVE User1 FROM Customer", "REMOVE SELECT ON Customer FROM User1", "REVOKE User1 FROM Customer"], correct: 0 },
+            { question: "You execute 'DELETE FROM Student' on a 100-row table. What is the result?", options: ["All rows containing a NULL value will be deleted", "You will receive an error message", "All rows and the table definition will be deleted", "All rows in the table will be deleted"], correct: 3 },
+            { question: "To ensure each record in Sales has a valid SalesPerson, add a:", options: ["Nonclustered index", "Primary key", "Foreign key", "Clustered index"], correct: 2 },
+            { question: "Which statement returns the number of rows in the Employee table?", options: ["SELECT COUNT(rows) FROM Employee", "SELECT SUM(*) FROM Employee", "SELECT COUNT(*) FROM Employee", "SELECT * FROM Employee"], correct: 2 },
+            { question: "Which SQL statement combines the results of two queries into a single result of all rows?", options: ["UNION", "EXCEPT", "JOIN", "TRUNCATE"], correct: 0 },
+            { question: "Which statement creates a composite key?", options: ["PRIMARY KEY (OrderID, OrderItemID)", "PRIMARY KEY OrderID, PRIMARY KEY OrderItemID", "OrderID INTEGER PRIMARY KEY, OrderItemID INTEGER PRIMARY KEY", "PRIMARY KEY"], correct: 0 },
+            { question: "Which data type should you recommend for running financial functions?", options: ["Varchar", "Decimal", "Bit", "Binary"], correct: 1 },
+            { question: "Which statement removes all rows without logging individual row deletions?", options: ["ALTER TABLE", "DROP TABLE", "CREATE TABLE", "TRUNCATE TABLE"], correct: 3 },
+            { question: "SELECT * FROM Cars c WHERE c.Origin <> 'USA' AND c.Color <> 'Black'. What does this do?", options: ["Selects all cars", "Selects cars that are neither from the USA nor painted Black", "Selects only Black cars from the USA", "Creates an error"], correct: 1 },
+            { question: "Which query returns orders placed after Jan 1, 2017 in all states except California?", options: ["WHERE order_date > '2017-01-01' AND ship_state <> 'CA'", "WHERE order_date > '2017-01-01' OR ship_state <> 'CA'", "WHERE order_date > '2017-01-01' OR ship_state LIKE 'CA'", "WHERE order_date > '2017-01-01' AND ship_state LIKE 'CA'"], correct: 0 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const nextBtn = document.getElementById('next-btn');
+        const currentQEl = document.getElementById('current-q');
+        const totalQEl = document.getElementById('total-q');
+        const quizInterface = document.getElementById('quiz-interface');
+        const resultScreen = document.getElementById('result-screen');
+        const finalScoreEl = document.getElementById('final-score');
+        const totalScoreEl = document.getElementById('total-score');
+
+        totalQEl.innerText = quizData.length;
+        loadQuestion();
+
+        function loadQuestion() {
+            optionsEl.innerHTML = '';
+            nextBtn.style.display = 'none';
+            
+            const currentData = quizData[currentQuestionIndex];
+            
+            questionEl.innerText = `${currentQuestionIndex + 1}. ${currentData.question}`;
+            currentQEl.innerText = currentQuestionIndex + 1;
+
+            currentData.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.innerText = option;
+                button.classList.add('option-btn');
+                button.addEventListener('click', () => selectAnswer(index, currentData.correct));
+                optionsEl.appendChild(button);
+            });
+        }
+
+        function selectAnswer(selectedIndex, correctIndex) {
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            buttons.forEach((btn, index) => {
+                btn.disabled = true;
+                if (index === correctIndex) {
+                    btn.classList.add('correct');
+                }
+                if (index === selectedIndex && index !== correctIndex) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            if (selectedIndex === correctIndex) {
+                score++;
+            }
+            nextBtn.style.display = 'block';
+        }
+
+        nextBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quizInterface.style.display = 'none';
+            resultScreen.style.display = 'block';
+            finalScoreEl.innerText = score;
+            totalScoreEl.innerText = quizData.length;
+        }
+    </script>
+</body>
+</html>
